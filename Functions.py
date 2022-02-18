@@ -33,11 +33,65 @@ def doc_add(add_shelf, add_type, add_number, add_name):
         for key, value in directories.items():
             if key == add_shelf:
                 value.append(add_number)
-        return documents, directories
+                return f'Документ {add_number} добавлен.'
     else:
         print('Неверный номер полки!')
         return doc_add(input('Введите номер полки для хранения: '), input('Введите тип документа: '),
                        input('Введите номер документа: '), input('Введите имя владельца документа: '))
+
+
+def doc_delete(doc_number):
+    control = []
+    for ask in directories.values():
+        for look in ask:
+            if look == doc_number:
+                control.append(look)
+                ask.remove(look)
+    for task in documents:
+        if task['number'] == doc_number:
+            documents.remove(task)
+            return f'Документ {doc_number} удалён.'
+    if len(control) == 0:
+        return doc_delete(input('Неверный номер! Введите номер документа повторно: '))
+
+
+def doc_move():
+    def enter_number(doc_number):
+        temp = []
+        for ask in directories.values():
+            for task in ask:
+                temp.append(task)
+        if doc_number in temp:
+            for ask in directories.values():
+                for task in ask:
+                    if task == doc_number:
+                        result = doc_number
+                        ask.remove(task)
+                        return result
+        else:
+            return enter_number(input('Неверный номер! Введите номер документа повторно: '))
+
+    def enter_shelf(add_shelf):
+        if add_shelf in directories.keys():
+            return add_shelf
+        else:
+            return enter_shelf(input('Неверный номер полки! Введите номер полки повторно: '))
+
+    number = enter_number(input('Введите номер документа: '))
+    shelf = enter_shelf(input('Введите номер полки: '))
+
+    for key, value in directories.items():
+        if key == shelf:
+            value.append(number)
+    return f'Документ перемещён.'
+
+
+def doc_add_shelf(add_shelf):
+    if add_shelf not in directories.keys():
+        directories[add_shelf] = []
+        return f'Полка {add_shelf} создана.'
+    else:
+        return doc_add_shelf(input('Полка уже существует! Введите номер полки повторно: '))
 
 
 def program(command=(input('Введите команду: ').lower())):
@@ -48,14 +102,14 @@ def program(command=(input('Введите команду: ').lower())):
     elif command == 'l':
         return doc_list()
     elif command == 'a':
-        return doc_add(input('Введите номер полки для хранения: '), input('Введите тип документа: '),
-                       input('Введите номер документа: '), input('Введите имя владельца документа: '))
-    # elif command == 'd':
-    #     return doc_delete()
-    # elif command == 'm':
-    #     return doc_move()
-    # elif command == 'as':
-    #     return doc_add_shelf()
+        return doc_add(input('Введите номер полки для хранения: '), input('Введите тип документа: ').lower(),
+                       input('Введите номер документа: '), input('Введите имя владельца документа: ').capitalize())
+    elif command == 'd':
+        return doc_delete(input('Введите номер документа: '))
+    elif command == 'm':
+        return doc_move()
+    elif command == 'as':
+        return doc_add_shelf(input('Введите номер полки для создания: '))
     else:
         return program(command=(input('Неверная команда! Введите команду повторно: ').lower()))
 
